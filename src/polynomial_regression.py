@@ -35,6 +35,13 @@ def train_polynomial_regression(X: np.array, y: np.array, degree: int):
     tuple: Trained model and polynomial feature transformer.
     """
 
+    X = np.asarray(X).reshape(-1, 1)
+    poly = PolynomialFeatures(degree=degree)
+    X_poly = poly.fit_transform(X)
+
+    model = LinearRegression()
+    model.fit(X_poly, y)
+
     return model, poly
 
 
@@ -51,6 +58,8 @@ def predict_prices(model: LinearRegression, poly: PolynomialFeatures, X: np.arra
     np.array: Predicted prices.
     """
 
+    X = np.asarray(X).reshape(-1, 1)
+    X_poly = poly.transform(X)
     return model.predict(X_poly)
 
 
@@ -66,7 +75,11 @@ def evaluate_model(y_true: np.array, y_pred: np.array):
     dict: Evaluation metrics.
     """
 
-    return {"MAE": mae, "MSE": mse, "RMSE": rmse}
+    mae = mean_absolute_error(y_true, y_pred)
+    mse = mean_squared_error(y_true, y_pred)
+    rmse = np.sqrt(mse)
+
+    return {"MAE": float(mae), "MSE": float(mse), "RMSE": float(rmse)}
 
 
 def visualize_data(X: np.array, y: np.array, model: LinearRegression, poly: PolynomialFeatures):
